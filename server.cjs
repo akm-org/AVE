@@ -1,0 +1,15 @@
+const http=require('http'),fs=require('fs'),path=require('path'),crypto=require('crypto');
+const root=__dirname, types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml'};
+const dbPath=path.join(root,'ave-data.json'), sessions=new Set();
+const defaultData={theme:{accent:'#55d9ff',accent2:'#826bff'},site:{name:'AVE',description:'Your central hub for files, resources, updates and community content.',discordUrl:'',youtubeUrl:''},announcement:{enabled:false,text:'',link:'#files'},nav:['Home','Files','Categories','Videos','Guides','Community','FAQ'],stats:[['Files','0'],['Downloads','0'],['Categories','0'],['Updates','0']],files:[],categories:[],faqs:[]};
+const read=()=>{try{return JSON.parse(fs.readFileSync(dbPath,'utf8'))}catch{return defaultData}}; const write=d=>fs.writeFileSync(dbPath,JSON.stringify(d,null,2));
+const send=(res,code,data,headers={})=>{res.writeHead(code,{'Content-Type':'application/json; charset=utf-8',...headers});res.end(JSON.stringify(data))};
+const cookie=req=>(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('ave_session='))?.split('=')[1];
+http.createServer((req,res)=>{let clean=decodeURIComponent(req.url.split('?')[0]);
+ if(clean==='/api/login'&&req.method==='POST'){let body='';req.on('data',d=>body+=d);req.on('end',()=>{try{let {email,password}=JSON.parse(body);if(email==='adwaithkm896@gmail.com'&&password==='akm2009@kali'){let token=crypto.randomUUID();sessions.add(token);return send(res,200,{ok:true},{'Set-Cookie':`ave_session=${token}; HttpOnly; SameSite=Strict; Path=/`})}send(res,401,{error:'Invalid email or password'})}catch{send(res,400,{error:'Invalid request'})}});return}
+ if(clean==='/api/logout'){sessions.delete(cookie(req));return send(res,200,{ok:true},{'Set-Cookie':'ave_session=; Max-Age=0; Path=/'})}
+ if(clean==='/api/public'&&req.method==='GET')return send(res,200,read());
+ if(clean==='/api/state'){if(!sessions.has(cookie(req)))return send(res,401,{error:'Sign in required'});if(req.method==='GET')return send(res,200,read());if(req.method==='PUT'){let body='';req.on('data',d=>body+=d);req.on('end',()=>{try{write(JSON.parse(body));send(res,200,{ok:true})}catch{send(res,400,{error:'Invalid data'})}});return}}
+ if(clean==='/assets/ave-logo.png'){let logo='C:\\Users\\adwai\\Downloads\\ave-logo.png';return fs.readFile(logo,(err,data)=>{if(err){res.writeHead(404);return res.end('Logo not found')}res.writeHead(200,{'Content-Type':'image/png','Cache-Control':'no-cache'});res.end(data)})}
+ let file=(clean==='/'||clean==='/admin')?'/index.html':clean;let target=path.resolve(root,'.'+file);if(!target.startsWith(root)){res.writeHead(403);return res.end('Forbidden')}fs.readFile(target,(err,data)=>{if(err){res.writeHead(404);return res.end('Not found')}res.writeHead(200,{'Content-Type':types[path.extname(target)]||'application/octet-stream','Cache-Control':'no-cache'});res.end(data)})
+}).listen(8000,'0.0.0.0',()=>console.log('AVE is running at http://localhost:8000'));

@@ -1,0 +1,63 @@
+{
+  "theme": {
+    "accent": "#55d9ff",
+    "accent2": "#826bff"
+  },
+  "site": {
+    "name": "AVE",
+    "description": "Your central hub for files, resources, updates and community content.",
+    "discordUrl": "",
+    "youtubeUrl": ""
+  },
+  "announcement": {
+    "enabled": false,
+    "text": "",
+    "link": "#files"
+  },
+  "nav": [
+    "Home",
+    "Files",
+    "Categories",
+    "Videos",
+    "Guides",
+    "Community",
+    "FAQ"
+  ],
+  "stats": [
+    [
+      "Files",
+      1
+    ],
+    [
+      "Downloads",
+      "0"
+    ],
+    [
+      "Categories",
+      1
+    ],
+    [
+      "Updates",
+      "0"
+    ]
+  ],
+  "files": [
+    {
+      "upload": {},
+      "title": "prestige",
+      "version": "v1.0.0",
+      "cat": "hhhh",
+      "desc": "dfgdsgdfg",
+      "platform": "Any",
+      "image": "dfgdd",
+      "size": "1.6 MB",
+      "id": 1789350157886,
+      "downloads": 0,
+      "badge": "NEW"
+    }
+  ],
+  "categories": [
+    "hhhh"
+  ],
+  "faqs": []
+}
